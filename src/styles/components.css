@@ -93,6 +93,62 @@
   transform: translateY(-1px);
 }
 
+/* ─── HAMBURGER ──────────────────────────────────────────────────── */
+.nav-hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 36px;
+  height: 36px;
+  padding: 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.nav-hamburger span {
+  display: block;
+  height: 2px;
+  background: var(--text-primary);
+  border-radius: 2px;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+  transform-origin: center;
+}
+
+.nav-hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.nav-hamburger.open span:nth-child(2) { opacity: 0; }
+.nav-hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+/* ─── MOBILE DRAWER ──────────────────────────────────────────────── */
+.nav-drawer {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 12px 24px 20px;
+  background: rgba(8, 8, 15, 0.97);
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+
+.nav-drawer-link {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  padding: 10px 0;
+  width: 100%;
+  transition: color var(--t-fast);
+}
+
+.nav-drawer-link:hover,
+.nav-drawer-link.active {
+  color: var(--text-primary);
+}
+
+.nav-drawer-cta {
+  margin-top: 8px;
+}
+
 /* ─── HERO ───────────────────────────────────────────────────────── */
 .hero {
   min-height: 100vh;
@@ -732,29 +788,30 @@
     linear-gradient(90deg, rgba(224, 64, 251, 0.06) 1px, transparent 1px);
 }
 
-.portfolio-lock {
+.portfolio-github-link {
   position: absolute;
-  inset: 0;
-  background: rgba(8, 8, 15, 0.75);
-  backdrop-filter: blur(4px);
-  display: flex;
-  flex-direction: column;
+  bottom: 14px;
+  right: 14px;
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
-
-.portfolio-lock-icon {
-  font-size: 1.8rem;
-  opacity: 0.6;
-}
-
-.portfolio-lock-text {
+  gap: 6px;
   font-family: var(--font-mono);
-  font-size: 0.65rem;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--text-muted);
+  font-size: 0.7rem;
+  font-weight: 500;
+  padding: 6px 12px;
+  border-radius: 6px;
+  background: rgba(8, 8, 15, 0.7);
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(8px);
+  text-decoration: none;
+  transition: color var(--t-fast), border-color var(--t-fast), background var(--t-fast);
+}
+
+.portfolio-github-link:hover {
+  color: var(--text-primary);
+  border-color: rgba(255,255,255,0.25);
+  background: rgba(8, 8, 15, 0.9);
 }
 
 .portfolio-card-body {
@@ -899,6 +956,10 @@
 
   .nav-links {
     display: none;
+  }
+
+  .nav-hamburger {
+    display: flex;
   }
 
   .hero-scroll-hint {
@@ -1232,4 +1293,13 @@
 @media (max-width: 480px) {
   .dt-root { bottom: 16px; right: 16px; }
   .dt-panel { width: calc(100vw - 32px); }
+}
+
+/* ─── REDUCED MOTION ─────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

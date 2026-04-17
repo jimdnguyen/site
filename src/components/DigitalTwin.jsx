@@ -1,4 +1,4 @@
-import { createSignal, For, Show, onMount, onCleanup } from 'solid-js';
+import { createSignal, For, Show, createEffect, onMount, onCleanup } from 'solid-js';
 
 const SUGGESTIONS = [
   "What's your current tech stack?",
@@ -7,7 +7,7 @@ const SUGGESTIONS = [
   "How did you become a founding engineer?",
 ];
 
-const API_URL = 'http://localhost:8001/api/chat';
+const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8001/api/chat';
 
 function sendIcon() {
   return (
@@ -177,15 +177,45 @@ export default function DigitalTwin() {
     }
   };
 
-  // Close on outside click
+  // Focus textarea when panel opens
+  createEffect(() => {
+    if (open() && textareaRef) setTimeout(() => textareaRef.focus(), 50);
+  });
+
+  // Close on outside click, Escape key; focus trap on Tab
   let panelRef;
+
   const handleOutside = (e) => {
-    if (open() && panelRef && !panelRef.contains(e.target)) {
-      setOpen(false);
+    if (open() && panelRef && !panelRef.contains(e.target)) setOpen(false);
+  };
+
+  const handleKeydown = (e) => {
+    if (!open()) return;
+    if (e.key === 'Escape') { setOpen(false); return; }
+    if (e.key !== 'Tab' || !panelRef) return;
+
+    const focusable = Array.from(
+      panelRef.querySelectorAll('a[href],button:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])')
+    );
+    if (!focusable.length) return;
+    const first = focusable[0];
+    const last  = focusable[focusable.length - 1];
+
+    if (e.shiftKey) {
+      if (document.activeElement === first) { e.preventDefault(); last.focus(); }
+    } else {
+      if (document.activeElement === last)  { e.preventDefault(); first.focus(); }
     }
   };
-  onMount(() => document.addEventListener('mousedown', handleOutside));
-  onCleanup(() => document.removeEventListener('mousedown', handleOutside));
+
+  onMount(() => {
+    document.addEventListener('mousedown', handleOutside);
+    document.addEventListener('keydown', handleKeydown);
+  });
+  onCleanup(() => {
+    document.removeEventListener('mousedown', handleOutside);
+    document.removeEventListener('keydown', handleKeydown);
+  });
 
   const hasUserMessages = () => messages().some(m => m.role === 'user');
 
@@ -193,7 +223,7 @@ export default function DigitalTwin() {
     <div class="dt-root" ref={panelRef}>
       {/* Chat panel */}
       <Show when={open()}>
-        <div class="dt-panel" role="dialog" aria-label="Digital Twin Chat">
+        <div class="dt-panel" role="dialog" aria-modal="true" aria-label="Digital Twin Chat">
           {/* Header */}
           <div class="dt-header">
             <div class="dt-header-left">
@@ -268,7 +298,9 @@ export default function DigitalTwin() {
       <button
         class={`dt-toggle${open() ? ' dt-toggle-open' : ''}`}
         onClick={() => setOpen(o => !o)}
-        aria-label="Open Digital Twin chat"
+        aria-label={open() ? 'Close Digital Twin chat' : 'Open Digital Twin chat'}
+        aria-expanded={open()}
+        aria-haspopup="dialog"
       >
         <Show when={open()}
           fallback={

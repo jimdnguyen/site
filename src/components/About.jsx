@@ -1,4 +1,4 @@
-import { createSignal, onMount, onCleanup } from 'solid-js';
+import { createSignal, onMount, onCleanup, For } from 'solid-js';
 
 const STATS = [
   { value: '3+',    suffix: '',   label: 'Years of\nProfessional Experience' },
@@ -101,9 +101,7 @@ export default function About() {
 
           {/* Stats column */}
           <div class="stats-grid">
-            {STATS.map((s, i) => (
-              <StatCard {...s} delay={i * 80} />
-            ))}
+            <For each={STATS}>{(s, i) => <StatCard {...s} delay={i() * 80} />}</For>
           </div>
         </div>
       </div>
