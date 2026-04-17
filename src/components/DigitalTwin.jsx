@@ -1,46 +1,5 @@
 import { createSignal, For, Show, onMount, onCleanup } from 'solid-js';
 
-const SYSTEM_PROMPT = `You are the Digital Twin of Jim Nguyen — a software engineer based in Hawthorne, CA. You speak in first person as Jim, answering questions about your career, skills, and experience concisely and with quiet confidence. Never fabricate information beyond what's provided below.
-
-## About Me
-I'm a full-stack software engineer specializing in Python backend systems, cloud infrastructure (AWS & GCP), and data pipelines. I'm the founding backend engineer at ComplyAi, where I've built the core platform from scratch.
-
-## Work Experience
-
-**Software Engineer I — ComplyAi** (Oct 2023 – Present, Hawthorne CA)
-- Founding engineer: led backend development collaborating with frontend engineer and head of engineering
-- Built and maintains the Flask backend: API design, service layer, data models
-- Co-implemented AWS cloud infrastructure: Secret Manager, ECS/ECR, IAM, SQS, RDS, S3
-- Co-implemented GCP services: Cloud Run, Cloud Storage, Cloud SQL, Vertex AI
-- Engineered data pipelines processing 300k+ ads with ~$500k ad spend; maintained rejection ratios below 10%
-- Enhanced throughput using Celery background tasks, Redis caching, and query optimization
-- Implemented Auth0 authentication with RBAC following OWASP security guidelines
-- Mentored interns and participated in agile sprints (JIRA/TRAC)
-
-**Junior Software Engineer — ComplyAi** (Aug 2022 – Oct 2023, Hawthorne CA)
-- Started as intern, transitioned to full-time within months
-- Built automated daily Google Sheets reporting system monitoring 1,000+ Facebook ads for compliance
-- Created AWS Lambda serverless integrations bridging internal services with Facebook's Marketing API
-- Collaborated with international React development team across time zones
-
-## Education
-- B.S. Computer Science & Engineering — University of California, Merced (2017–2022)
-- Da Vinci Science High School (2013–2017)
-
-## Technical Skills
-- **Backend**: Python, Flask, PostgreSQL, SQLAlchemy, Celery, Redis, REST APIs
-- **Cloud & DevOps**: AWS (ECS/ECR, Lambda, RDS, S3, SQS, IAM), GCP (Cloud Run, Cloud SQL, Cloud Storage, Vertex AI), Docker, CI/CD
-- **Frontend**: React, JavaScript, HTML/CSS
-- **Tools & Integrations**: Auth0, RBAC/OWASP, Facebook Marketing API, Google Sheets API, JIRA, Git
-
-## Contact
-- Email: jim.nguyen2017@gmail.com
-- LinkedIn: linkedin.com/in/jimnguyen2017
-- Location: Hawthorne, CA (open to remote)
-
-## Tone
-Be direct, professional, and personable. Keep answers concise — 2-4 sentences unless a longer answer is genuinely needed. If asked something outside my professional background, politely redirect.`;
-
 const SUGGESTIONS = [
   "What's your current tech stack?",
   "Tell me about ComplyAi",
@@ -48,8 +7,7 @@ const SUGGESTIONS = [
   "How did you become a founding engineer?",
 ];
 
-const API_KEY = import.meta.env.OPENROUTER_API_KEY;
-const MODEL   = 'openrouter/free';
+const API_URL = 'http://localhost:8001/api/chat';
 
 function sendIcon() {
   return (
@@ -76,6 +34,33 @@ export default function DigitalTwin() {
   let messagesRef;
   let textareaRef;
   let abortCtrl;
+  let typeQueue = '';
+  let typeInterval = null;
+
+  const startTypewriter = (botId) => {
+    if (typeInterval) return;
+    let leadingTrimmed = false;
+    typeInterval = setInterval(() => {
+      if (!typeQueue.length) return;
+      if (!leadingTrimmed) { typeQueue = typeQueue.trimStart(); leadingTrimmed = true; }
+      if (!typeQueue.length) return;
+      // drain faster if queue is building up, to avoid falling behind
+      const charsPerTick = typeQueue.length > 40 ? 4 : 1;
+      const chunk = typeQueue.slice(0, charsPerTick);
+      typeQueue = typeQueue.slice(charsPerTick);
+      setMessages(prev =>
+        prev.map(m => m.id === botId ? { ...m, content: (m.content || '') + chunk, loading: false } : m)
+      );
+      scrollBottom();
+    }, 18);
+  };
+
+  const stopTypewriter = () => {
+    if (typeInterval) { clearInterval(typeInterval); typeInterval = null; }
+    typeQueue = '';
+  };
+
+  onCleanup(stopTypewriter);
 
   const scrollBottom = () => {
     if (messagesRef) messagesRef.scrollTop = messagesRef.scrollHeight;
@@ -109,79 +94,65 @@ export default function DigitalTwin() {
       .filter(m => !m.loading && m.content)
       .map(m => ({ role: m.role, content: m.content }));
 
-    const apiMessages = [
-      { role: 'system', content: SYSTEM_PROMPT },
-      ...history,
-      { role: 'user', content },
-    ];
+    const apiMessages = [...history, { role: 'user', content }];
+
+    typeQueue = '';
+    startTypewriter(botId);
 
     try {
-      const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      const res = await fetch(API_URL, {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${API_KEY}`,
-          'Content-Type': 'application/json',
-          'HTTP-Referer': 'http://localhost:5173',
-          'X-Title': 'Jim Nguyen Digital Twin',
-        },
-        body: JSON.stringify({ model: MODEL, messages: apiMessages, stream: true }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: apiMessages }),
         signal: abortCtrl.signal,
       });
 
-      if (!res.ok) {
-        throw new Error(`API error ${res.status}`);
-      }
+      if (!res.ok) throw new Error(`API error ${res.status}`);
 
       const reader  = res.body.getReader();
       const decoder = new TextDecoder();
-      let contentAccumulated = '';
-      let reasoningAccumulated = '';
       let buffer = '';
+      const STALL_MS = 15_000;
+      let stallTimer = setTimeout(() => abortCtrl.abort(), STALL_MS);
+      const resetStall = () => { clearTimeout(stallTimer); stallTimer = setTimeout(() => abortCtrl.abort(), STALL_MS); };
 
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
+      try {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          resetStall();
 
-        buffer += decoder.decode(value, { stream: true });
-        const lines = buffer.split('\n');
-        buffer = lines.pop(); // keep incomplete last line
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split('\n');
+          buffer = lines.pop();
 
-        for (const line of lines) {
-          const trimmed = line.trim();
-          if (!trimmed.startsWith('data: ')) continue;
-          const data = trimmed.slice(6);
-          if (data === '[DONE]') continue;
-          try {
-            const parsed = JSON.parse(data);
-            const choice = parsed.choices?.[0]?.delta ?? {};
-            if (choice.content) {
-              contentAccumulated += choice.content;
-              setMessages(prev =>
-                prev.map(m => m.id === botId ? { ...m, content: contentAccumulated, loading: false } : m)
-              );
-              scrollBottom();
-            } else if (choice.reasoning) {
-              reasoningAccumulated += choice.reasoning;
-              // keep loading: true during reasoning — typing indicator stays visible
+          for (const line of lines) {
+            const trimmed = line.trim();
+            if (!trimmed.startsWith('data: ')) continue;
+            const data = trimmed.slice(6);
+            if (data === '[DONE]') continue;
+            try {
+              const parsed = JSON.parse(data);
+              if (parsed.content) typeQueue += parsed.content;
+              if (parsed.error) throw new Error(parsed.error);
+            } catch (parseErr) {
+              if (parseErr.message?.includes('error')) throw parseErr;
+              // malformed chunk — skip
             }
-          } catch {
-            // malformed chunk — skip
           }
         }
+      } finally {
+        clearTimeout(stallTimer);
       }
 
-      // If we received reasoning but content replaced it, ensure final content is shown
-      if (contentAccumulated) {
-        setMessages(prev =>
-          prev.map(m => m.id === botId ? { ...m, content: contentAccumulated, loading: false } : m)
-        );
-      }
-
-      // Finalize: ensure loading is cleared even if no delta arrived
-      setMessages(prev =>
-        prev.map(m => m.id === botId ? { ...m, loading: false } : m)
-      );
+      // wait for typewriter to drain before releasing streaming lock
+      await new Promise(resolve => {
+        const check = setInterval(() => {
+          if (!typeQueue.length) { clearInterval(check); resolve(); }
+        }, 20);
+      });
     } catch (err) {
+      stopTypewriter();
       if (err.name !== 'AbortError') {
         setMessages(prev =>
           prev.map(m =>
@@ -192,6 +163,8 @@ export default function DigitalTwin() {
         );
       }
     } finally {
+      stopTypewriter();
+      setMessages(prev => prev.map(m => m.id === botId ? { ...m, loading: false } : m));
       setStreaming(false);
       setTimeout(scrollBottom, 30);
     }
