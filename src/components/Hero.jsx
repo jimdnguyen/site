@@ -9,7 +9,6 @@ const TITLES = [
 ];
 
 export default function Hero() {
-  const [, setTitleIndex] = createSignal(0);
   const [displayText, setDisplayText] = createSignal('');
   const [isDeleting, setIsDeleting] = createSignal(false);
 
@@ -43,7 +42,6 @@ export default function Hero() {
         if (charIndex === 0) {
           setIsDeleting(false);
           currentTitle = (currentTitle + 1) % TITLES.length;
-          setTitleIndex(currentTitle);
         }
       }
       timeout = setTimeout(type, isDeleting() ? 45 : 80);
