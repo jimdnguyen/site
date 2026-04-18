@@ -723,6 +723,13 @@
   text-align: center;
 }
 
+.portfolio-description {
+  color: var(--text-secondary);
+  font-size: 1rem;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
 .portfolio-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -984,6 +991,48 @@
 
   .hero-actions {
     flex-direction: column;
+  }
+
+  .skills-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .skill-category {
+    padding: 20px;
+  }
+
+  .portfolio-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .portfolio-card-preview {
+    height: 140px;
+    font-size: 2.5rem;
+  }
+
+  .timeline-item {
+    padding-left: 12px;
+  }
+
+  .timeline-dot {
+    left: -20px;
+    width: 12px;
+    height: 12px;
+  }
+
+  .timeline-line {
+    left: -14px;
+  }
+
+  .dt-panel {
+    width: calc(100vw - 24px);
+    max-height: calc(100vh - 120px);
+  }
+
+  .dt-toggle-label {
+    display: none;
   }
 }
 

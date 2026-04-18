@@ -39,6 +39,20 @@ export default function DigitalTwin() {
 
   const startTypewriter = (botId) => {
     if (typeInterval) return;
+
+    // Check if user prefers reduced motion
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (prefersReducedMotion) {
+      // Display the entire message immediately without animation
+      setMessages(prev =>
+        prev.map(m => m.id === botId ? { ...m, content: (m.content || '') + typeQueue, loading: false } : m)
+      );
+      typeQueue = '';
+      scrollBottom();
+      return;
+    }
+
     let leadingTrimmed = false;
     typeInterval = setInterval(() => {
       if (!typeQueue.length) return;
@@ -244,7 +258,7 @@ export default function DigitalTwin() {
           </div>
 
           {/* Messages */}
-          <div class="dt-messages" ref={el => { messagesRef = el; }}>
+          <div class="dt-messages" ref={el => { messagesRef = el; }} aria-live="polite" aria-label="Chat messages">
             <For each={messages()}>
               {(msg) => (
                 <div class={`dt-bubble dt-bubble-${msg.role}`}>

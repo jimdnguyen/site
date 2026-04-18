@@ -85,7 +85,7 @@ function TimelineItem(props) {
     <div
       class={`timeline-item reveal${vis() ? ' visible' : ''}`}
       ref={setRef}
-      style={`transition-delay: ${props.delay}ms`}
+      style={{"transition-delay": `${props.delay}ms`}}
     >
       <div class="timeline-dot" />
       <div class="timeline-period">{props.item.period}</div>

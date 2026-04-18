@@ -51,13 +51,13 @@ function ProjectCard(props) {
     <div
       class={`portfolio-card reveal${vis() ? ' visible' : ''}`}
       ref={setRef}
-      style={`transition-delay: ${props.delay}ms`}
+      style={{"transition-delay": `${props.delay}ms`}}
     >
       <div class={`portfolio-card-preview ${props.project.bgClass}`}>
         <div class="portfolio-card-preview-bg" />
         <span
           class="portfolio-card-preview-icon"
-          style={`color: ${props.project.iconColor}`}
+          style={{"color": props.project.iconColor}}
         >
           {props.project.icon}
         </span>
@@ -105,7 +105,7 @@ export default function Portfolio() {
           <h2 class="section-title">
             Open-source <span class="accent">projects.</span>
           </h2>
-          <p style="color: var(--text-secondary); font-size: 1rem; max-width: 480px; margin: 0 auto">
+          <p class="portfolio-description">
             Full-stack AI applications built with FastAPI, modern frontend frameworks, and LLM integrations — each packaged in Docker and ready to run.
           </p>
         </div>

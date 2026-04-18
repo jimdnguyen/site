@@ -30,10 +30,10 @@ function StatCard(props) {
     <div
       class={`stat-card reveal${vis() ? ' visible' : ''}`}
       ref={setRef}
-      style={`transition-delay: ${props.delay}ms`}
+      style={{"transition-delay": `${props.delay}ms`}}
     >
       <div class="stat-number">{props.value}</div>
-      <div class="stat-label" style="white-space: pre-line">{props.label}</div>
+      <div class="stat-label" style={{"white-space":"pre-line"}}>{props.label}</div>
     </div>
   );
 }

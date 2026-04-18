@@ -57,7 +57,7 @@ function SkillCategoryCard(props) {
     <div
       class={`skill-category reveal${vis() ? ' visible' : ''}`}
       ref={setRef}
-      style={`transition-delay: ${props.delay}ms`}
+      style={{"transition-delay": `${props.delay}ms`}}
     >
       <div class="skill-cat-icon">{props.cat.icon}</div>
       <div class="skill-cat-title">{props.cat.title}</div>

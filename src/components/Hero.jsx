@@ -9,11 +9,20 @@ const TITLES = [
 ];
 
 export default function Hero() {
-  const [titleIndex, setTitleIndex] = createSignal(0);
+  const [, setTitleIndex] = createSignal(0);
   const [displayText, setDisplayText] = createSignal('');
   const [isDeleting, setIsDeleting] = createSignal(false);
 
   onMount(() => {
+    // Check if user prefers reduced motion
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (prefersReducedMotion) {
+      // Show the full text immediately without animation
+      setDisplayText(TITLES[0]);
+      return;
+    }
+
     let charIndex = 0;
     let currentTitle = 0;
     let timeout;
@@ -68,7 +77,7 @@ export default function Hero() {
 
           <div class="hero-title-row">
             <span class="hero-title">
-              <span style="color: var(--text-muted)">~/</span>{' '}
+              <span style={{"color":"var(--text-muted)"}}>~/</span>{' '}
               <span class="hero-title-typed">{displayText()}</span>
               <span class="hero-cursor" />
             </span>
@@ -77,8 +86,8 @@ export default function Hero() {
           <p class="hero-bio">
             Founding engineer at ComplyAi — building scalable cloud infrastructure,
             data pipelines, and API integrations processing{' '}
-            <strong style="color: var(--text-primary)">1.4M+ ads</strong> across{' '}
-            <strong style="color: var(--text-primary)">AWS & GCP</strong> for 15+ clients.
+            <strong style={{"color":"var(--text-primary)"}}>1.4M+ ads</strong> across{' '}
+            <strong style={{"color":"var(--text-primary)"}}>AWS & GCP</strong> for 15+ clients.
             Backend-focused, AI-augmented, always shipping.
           </p>
 

@@ -39,6 +39,10 @@ uv sync
 uv run uvicorn main:app --reload --port 8001
 ```
 
+**API Documentation** (when backend is running):
+- Swagger UI: http://localhost:8001/docs
+- ReDoc: http://localhost:8001/redoc
+
 ### Environment
 
 Copy `.env.example` to `.env` and fill in the values:

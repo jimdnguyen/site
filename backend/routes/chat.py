@@ -1,13 +1,16 @@
 import json
 import os
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Request
 from fastapi.responses import StreamingResponse
 from litellm import completion
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 
 from models import ChatRequest
 
 router = APIRouter()
+limiter = Limiter(key_func=get_remote_address)
 
 SYSTEM_PROMPT = """You are the Digital Twin of Jim Nguyen — a software engineer based in Hawthorne, CA. You speak in first person as Jim, answering questions about your career, skills, and experience concisely and with quiet confidence. Never fabricate information beyond what's provided below.
 
@@ -83,8 +86,9 @@ def _stream(messages: list[dict]):
 
 
 @router.post("/chat")
-def chat(request: ChatRequest):
-    """Proxy chat messages to OpenRouter, streaming the response."""
+@limiter.limit("10/minute")
+def chat(request: Request, chat_request: ChatRequest):
+    """Proxy chat messages to OpenRouter, streaming the response. Rate limited to 10 requests per minute."""
     messages = [{"role": "system", "content": SYSTEM_PROMPT}]
-    messages += [{"role": m.role, "content": m.content} for m in request.messages]
+    messages += [{"role": m.role, "content": m.content} for m in chat_request.messages]
     return _stream(messages)

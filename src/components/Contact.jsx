@@ -39,6 +39,7 @@ export default function Contact() {
             <a
               href="mailto:jim.nguyen2017@gmail.com"
               class="contact-link-card"
+              aria-label="Send email to jim.nguyen2017@gmail.com"
             >
               <span class="contact-link-icon">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -54,6 +55,7 @@ export default function Contact() {
               target="_blank"
               rel="noopener noreferrer"
               class="contact-link-card"
+              aria-label="Visit LinkedIn profile"
             >
               <span class="contact-link-icon">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
@@ -70,6 +72,7 @@ export default function Contact() {
               target="_blank"
               rel="noopener noreferrer"
               class="contact-link-card"
+              aria-label="Visit GitHub profile"
             >
               <span class="contact-link-icon">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
