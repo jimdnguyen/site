@@ -1076,14 +1076,7 @@
   width: 38px;
   height: 38px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--indigo), var(--cyan));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  font-weight: 700;
-  color: #fff;
+  object-fit: cover;
   flex-shrink: 0;
   box-shadow: 0 0 12px rgba(99, 102, 241, 0.5);
 }

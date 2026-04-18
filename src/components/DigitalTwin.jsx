@@ -227,7 +227,7 @@ export default function DigitalTwin() {
           {/* Header */}
           <div class="dt-header">
             <div class="dt-header-left">
-              <div class="dt-avatar" aria-hidden="true">JN</div>
+              <img class="dt-avatar" src="/avatar.png" alt="" aria-hidden="true" />
               <div>
                 <div class="dt-title">Digital Twin</div>
                 <div class="dt-subtitle">
