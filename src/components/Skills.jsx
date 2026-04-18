@@ -19,28 +19,34 @@ const CATEGORIES = [
     icon: '⚙️',
     title: 'Backend',
     tagClass: 'tag-backend',
-    tags: ['Python', 'Flask', 'PostgreSQL', 'SQLAlchemy', 'Celery', 'Redis', 'REST APIs'],
+    tags: ['Python', 'Flask', 'PostgreSQL', 'Celery', 'REST APIs', 'AWS Lambda', 'Spring Boot', 'SQL'],
   },
   {
     icon: '☁️',
     title: 'Cloud & DevOps',
     tagClass: 'tag-cloud',
     tags: [
-      'AWS ECS/ECR', 'AWS Lambda', 'AWS RDS', 'AWS S3', 'AWS SQS', 'AWS IAM',
-      'GCP Cloud Run', 'GCP Cloud SQL', 'GCP Vertex AI', 'Docker', 'CI/CD',
+      'AWS ECS/ECR', 'AWS RDS', 'AWS S3', 'AWS SQS', 'AWS Route 53', 'AWS ELB',
+      'GCP Cloud Run', 'GCP Cloud SQL', 'Docker', 'GitHub Actions', 'CI/CD',
     ],
+  },
+  {
+    icon: '🤖',
+    title: 'AI & Agentic',
+    tagClass: 'tag-frontend',
+    tags: ['Claude Code', 'Claude Agent SDK', 'Multi-Agent Orchestration', 'MCP', 'Hooks', 'LLM-Assisted Dev', 'Cursor', 'Copilot', 'Codex'],
   },
   {
     icon: '🖥️',
     title: 'Frontend',
     tagClass: 'tag-frontend',
-    tags: ['React', 'JavaScript', 'HTML/CSS', 'Responsive Design'],
+    tags: ['React', 'JavaScript', 'HTML/CSS', 'Redux', 'Tailwind CSS'],
   },
   {
     icon: '🔧',
     title: 'Tools & Integrations',
     tagClass: 'tag-tools',
-    tags: ['Auth0', 'RBAC / OWASP', 'Facebook Marketing API', 'Google Sheets API', 'JIRA', 'Git'],
+    tags: ['Auth0', 'Stripe', 'Facebook Marketing API', 'SendGrid', 'Linear', 'JIRA', 'Slack', 'Git'],
   },
 ];
 

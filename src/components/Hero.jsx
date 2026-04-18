@@ -76,10 +76,10 @@ export default function Hero() {
 
           <p class="hero-bio">
             Founding engineer at ComplyAi — building scalable cloud infrastructure,
-            intelligent data pipelines, and robust API integrations that process{' '}
-            <strong style="color: var(--text-primary)">300k+ ads</strong> at{' '}
-            <strong style="color: var(--text-primary)">~$500k ad spend</strong>.
-            Bridging enterprise-grade backend systems with modern product thinking.
+            data pipelines, and API integrations processing{' '}
+            <strong style="color: var(--text-primary)">1.4M+ ads</strong> across{' '}
+            <strong style="color: var(--text-primary)">AWS & GCP</strong> for 15+ clients.
+            Backend-focused, AI-augmented, always shipping.
           </p>
 
           <div class="hero-actions">

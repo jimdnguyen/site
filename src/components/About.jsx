@@ -1,10 +1,10 @@
 import { createSignal, onMount, onCleanup, For } from 'solid-js';
 
 const STATS = [
-  { value: '3+',    suffix: '',   label: 'Years of\nProfessional Experience' },
-  { value: '300K+', suffix: '',   label: 'Ads Monitored\nThrough Data Pipelines' },
-  { value: '$500K+',suffix: '',   label: 'Ad Spend\nManaged & Optimized' },
-  { value: '2',     suffix: '',   label: 'Major Cloud Platforms\n(AWS & GCP)' },
+  { value: '3+',    label: 'Years of\nProfessional Experience' },
+  { value: '1.4M+', label: 'Ads Processed\nThrough Data Pipelines' },
+  { value: '15+',   label: 'Clients Supported\nAcross AWS & GCP' },
+  { value: '2',     label: 'Major Cloud Platforms\n(AWS & GCP)' },
 ];
 
 function useReveal(threshold = 0.15) {
@@ -58,21 +58,19 @@ export default function About() {
             </div>
 
             <p class="about-bio">
-              I'm a <strong>full-stack software engineer</strong> based in Hawthorne, CA,
-              with deep expertise in Python, cloud infrastructure, and data engineering.
-              As a <strong>founding engineer at ComplyAi</strong>, I architected the core
-              backend from the ground up — from serverless Lambda functions to multi-region
-              ECS deployments on AWS and GCP.
+              I'm a <strong>backend-focused software engineer</strong> based in Hawthorne, CA,
+              with 3+ years building and operating production systems at a compliance tech startup.
+              As a <strong>founding engineer at ComplyAi</strong>, I helped scale a prototype
+              into a multi-client SaaS platform processing{' '}
+              <strong>1.4M+ ads</strong> across AWS and GCP infrastructure.
             </p>
             <p class="about-bio">
-              I thrive in early-stage environments where ownership is high and problems are
-              novel. I've led intern cohorts, shipped compliance tooling used across
-              <strong> 300k+ live ads</strong>, and designed the auth, infra, and API
-              integration layers that underpin the product.
+              Experienced in Python/Flask, PostgreSQL, Celery, and cloud operations.
+              Currently deepening expertise in AI and agentic engineering patterns using
+              Claude Code and LLM-assisted development workflows.
             </p>
             <p class="about-bio">
-              UC Merced CS grad. Native English speaker, conversational Vietnamese.
-              Always shipping.
+              UC Merced CS grad. Native English &amp; Vietnamese speaker. Always shipping.
             </p>
 
             <div class="about-links">
