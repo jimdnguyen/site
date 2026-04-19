@@ -68,12 +68,21 @@ jobs:
         run: pip install uv && uv sync
         working-directory: backend
       - name: Start backend
-        run: uv run uvicorn main:app --port 8001 &
+        run: |
+          uv run uvicorn main:app --port 8001 > /tmp/backend.log 2>&1 &
+          echo $! > /tmp/backend.pid
         working-directory: backend
         env:
           OPENROUTER_API_KEY: placeholder
       - name: Wait for backend
-        run: npx wait-on http://localhost:8001/api/health --timeout 60000
+        run: |
+          npx wait-on http://localhost:8001/api/health --timeout 60000 || {
+            echo "=== Backend logs ==="
+            cat /tmp/backend.log
+            echo "=== Process status ==="
+            kill -0 $(cat /tmp/backend.pid) 2>&1 || echo "Backend process is dead"
+            exit 1
+          }
       - run: npm run test:e2e
         env:
           OPENROUTER_API_KEY: placeholder
