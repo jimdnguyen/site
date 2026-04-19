@@ -31,6 +31,57 @@ jobs:
       - run: npm ci
       - run: npm test
 
+  backend-test:
+    name: Backend Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install uv
+        run: pip install uv
+      - run: uv sync --dev
+        working-directory: backend
+      - run: uv run pytest tests/ -v
+        working-directory: backend
+
+  e2e:
+    name: E2E Tests
+    runs-on: ubuntu-latest
+    needs: [lint, test]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: npm ci
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+      - name: Install uv and backend deps
+        run: pip install uv && uv sync
+        working-directory: backend
+      - name: Start backend
+        run: uv run uvicorn main:app --port 8001 &
+        working-directory: backend
+        env:
+          OPENROUTER_API_KEY: placeholder
+      - name: Start frontend dev server
+        run: npm run dev &
+      - name: Wait for servers
+        run: npx wait-on http://localhost:5173 http://localhost:8001/api/health --timeout 30000
+      - run: npm run test:e2e
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7
+
   build:
     name: Build
     runs-on: ubuntu-latest

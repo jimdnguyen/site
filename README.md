@@ -2,6 +2,8 @@
 
 Personal portfolio and AI Digital Twin — built with SolidJS, Vite, and a FastAPI backend.
 
+![Portfolio preview](public/preview.png)
+
 ## Stack
 
 | Layer | Technology |
@@ -55,6 +57,26 @@ cp .env.example .env
 |----------|-------------|
 | `VITE_API_URL` | Backend chat endpoint (defaults to `http://localhost:8001/api/chat`) |
 | `OPENROUTER_API_KEY` | OpenRouter API key — used by the backend only, never exposed to the browser |
+
+## Architecture
+
+```
+Browser
+  │
+  ├── SolidJS frontend (Vite, vanilla CSS)
+  │     ├── Components: Hero, Nav, About, Timeline, Skills, Portfolio, Contact
+  │     └── DigitalTwin widget
+  │           │  POST /api/chat  (SSE stream)
+  │           ▼
+  └── FastAPI backend (Python 3.13, uv)
+        ├── /api/health        — liveness probe
+        ├── /api/chat          — rate-limited (10 req/min), streams LLM tokens
+        │     │
+        │     ▼  LiteLLM completion(stream=True)
+        └── OpenRouter → Free LLM model
+```
+
+The frontend and backend are deployed as separate services. `VITE_API_URL` points the SolidJS app at the backend's `/api/chat` endpoint at build time.
 
 ## Deployment
 
