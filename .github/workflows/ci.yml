@@ -75,14 +75,7 @@ jobs:
         env:
           OPENROUTER_API_KEY: placeholder
       - name: Wait for backend
-        run: |
-          npx wait-on http://localhost:8001/api/health --timeout 60000 || {
-            echo "=== Backend logs ==="
-            cat /tmp/backend.log
-            echo "=== Process status ==="
-            kill -0 $(cat /tmp/backend.pid) 2>&1 || echo "Backend process is dead"
-            exit 1
-          }
+        run: npx wait-on http-get://localhost:8001/api/health --timeout 60000
       - run: npm run test:e2e
         env:
           OPENROUTER_API_KEY: placeholder
