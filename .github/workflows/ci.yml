@@ -45,6 +45,8 @@ jobs:
         working-directory: backend
       - run: uv run pytest tests/ -v
         working-directory: backend
+        env:
+          OPENROUTER_API_KEY: test
 
   e2e:
     name: E2E Tests
@@ -70,11 +72,11 @@ jobs:
         working-directory: backend
         env:
           OPENROUTER_API_KEY: placeholder
-      - name: Start frontend dev server
-        run: npm run dev &
-      - name: Wait for servers
-        run: npx wait-on http://localhost:5173 http://localhost:8001/api/health --timeout 30000
+      - name: Wait for backend
+        run: npx wait-on http://localhost:8001/api/health --timeout 60000
       - run: npm run test:e2e
+        env:
+          OPENROUTER_API_KEY: placeholder
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
