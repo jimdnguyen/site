@@ -20,6 +20,26 @@ Personal portfolio and AI Digital Twin — built with SolidJS, Vite, and a FastA
 - Smooth scroll-reveal animations with `prefers-reduced-motion` support
 - Fully responsive with mobile hamburger nav
 
+## Docker (Quickstart)
+
+```bash
+cp .env.example .env     # add your OPENROUTER_API_KEY
+make start               # build and run at http://localhost:8000
+```
+
+The Docker container builds the SolidJS frontend and serves it from FastAPI alongside the API — single container, single port.
+
+### Makefile
+
+```bash
+make start       # build and start on http://localhost:8000
+make stop        # stop containers
+make logs        # tail container logs
+make test        # run backend + frontend unit tests
+make test-e2e    # run Playwright E2E (needs backend running)
+make clean       # stop and remove containers
+```
+
 ## Local Development
 
 ### Frontend
