@@ -33,8 +33,13 @@ function rafScrollTo(targetY, duration = 650) {
   requestAnimationFrame(frame);
 }
 
-function handleNavClick(e, href) {
+let clickLock = false;
+
+function handleNavClick(e, href, setActive) {
   e.preventDefault();
+  if (setActive) setActive(href);
+  clickLock = true;
+  setTimeout(() => (clickLock = false), 800);
   const id = href.replace('#', '');
   if (!id) {
     rafScrollTo(0);
@@ -57,7 +62,7 @@ export default function Nav() {
   const closeMenu = () => setMenuOpen(false);
 
   const navClick = (e, href) => {
-    handleNavClick(e, href);
+    handleNavClick(e, href, setActive);
     closeMenu();
   };
 
@@ -65,7 +70,8 @@ export default function Nav() {
     const onScroll = () => {
       setScrolled(window.scrollY > 30);
 
-      // Scroll-spy
+      // Scroll-spy (suppressed briefly after nav click)
+      if (clickLock) return;
       const sections = ['about', 'career', 'skills', 'portfolio', 'contact'];
       for (const id of [...sections].reverse()) {
         const el = document.getElementById(id);
@@ -103,12 +109,12 @@ export default function Nav() {
             <a
               href={l.href}
               class={`nav-link${active() === l.href ? ' active' : ''}`}
-              onClick={(e) => handleNavClick(e, l.href)}
+              onClick={(e) => handleNavClick(e, l.href, setActive)}
             >
               {l.label}
             </a>
           }</For>
-          <a href="#contact" class="nav-cta" onClick={(e) => handleNavClick(e, '#contact')}>Hire Me</a>
+          <a href="#contact" class="nav-cta" onClick={(e) => handleNavClick(e, '#contact', setActive)}>Hire Me</a>
         </div>
 
         {/* Hamburger (mobile only) */}
