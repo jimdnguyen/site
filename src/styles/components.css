@@ -1219,6 +1219,13 @@
   white-space: pre-wrap;
 }
 
+.dt-disclaimer {
+  text-align: center;
+  font-size: 0.7rem;
+  color: var(--text-muted, rgba(255,255,255,0.3));
+  margin: 0 0 6px;
+}
+
 /* Typing indicator */
 .dt-typing {
   display: flex;

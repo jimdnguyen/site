@@ -7,7 +7,7 @@ const SUGGESTIONS = [
   "How did you become a founding engineer?",
 ];
 
-const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8001/api/chat';
+const API_URL = import.meta.env.VITE_API_URL ?? '/api/chat';
 
 function sendIcon() {
   return (
@@ -37,28 +37,15 @@ export default function DigitalTwin() {
   let typeQueue = '';
   let typeInterval = null;
 
+  const prefersReducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
   const startTypewriter = (botId) => {
     if (typeInterval) return;
-
-    // Check if user prefers reduced motion
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-    if (prefersReducedMotion) {
-      // Display the entire message immediately without animation
-      setMessages(prev =>
-        prev.map(m => m.id === botId ? { ...m, content: (m.content || '') + typeQueue, loading: false } : m)
-      );
-      typeQueue = '';
-      scrollBottom();
-      return;
-    }
-
     let leadingTrimmed = false;
     typeInterval = setInterval(() => {
       if (!typeQueue.length) return;
       if (!leadingTrimmed) { typeQueue = typeQueue.trimStart(); leadingTrimmed = true; }
       if (!typeQueue.length) return;
-      // drain faster if queue is building up, to avoid falling behind
       const charsPerTick = typeQueue.length > 40 ? 4 : 1;
       const chunk = typeQueue.slice(0, charsPerTick);
       typeQueue = typeQueue.slice(charsPerTick);
@@ -93,6 +80,14 @@ export default function DigitalTwin() {
     setInput('');
     if (textareaRef) { textareaRef.style.height = 'auto'; }
 
+    // Build API payload before updating messages signal to avoid duplicating user msg
+    const apiMessages = [
+      ...messages()
+        .filter(m => !m.loading && m.content)
+        .map(m => ({ role: m.role, content: m.content })),
+      { role: 'user', content },
+    ];
+
     const userMsg  = { id: Date.now(),     role: 'user',      content, loading: false };
     const botId    = Date.now() + 1;
     const botMsg   = { id: botId,          role: 'assistant', content: '', loading: true };
@@ -102,13 +97,6 @@ export default function DigitalTwin() {
     setTimeout(scrollBottom, 30);
 
     abortCtrl = new AbortController();
-
-    // Build message history for API (exclude loading placeholders)
-    const history = messages()
-      .filter(m => !m.loading && m.content)
-      .map(m => ({ role: m.role, content: m.content }));
-
-    const apiMessages = [...history, { role: 'user', content }];
 
     typeQueue = '';
     startTypewriter(botId);
@@ -159,12 +147,23 @@ export default function DigitalTwin() {
         clearTimeout(stallTimer);
       }
 
-      // wait for typewriter to drain before releasing streaming lock
-      await new Promise(resolve => {
-        const check = setInterval(() => {
-          if (!typeQueue.length) { clearInterval(check); resolve(); }
-        }, 20);
-      });
+      // wait for typewriter to drain (or dump immediately if reduced motion)
+      if (prefersReducedMotion()) {
+        typeQueue = typeQueue.trimStart();
+        if (typeQueue.length) {
+          setMessages(prev =>
+            prev.map(m => m.id === botId ? { ...m, content: (m.content || '') + typeQueue, loading: false } : m)
+          );
+          typeQueue = '';
+          scrollBottom();
+        }
+      } else {
+        await new Promise(resolve => {
+          const check = setInterval(() => {
+            if (!typeQueue.length) { clearInterval(check); resolve(); }
+          }, 20);
+        });
+      }
     } catch (err) {
       stopTypewriter();
       if (err.name !== 'AbortError') {
@@ -282,6 +281,9 @@ export default function DigitalTwin() {
               </div>
             </Show>
           </div>
+
+          {/* Disclaimer */}
+          <p class="dt-disclaimer">AI-generated · may not be 100% accurate</p>
 
           {/* Input */}
           <div class="dt-input-row">
