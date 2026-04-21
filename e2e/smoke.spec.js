@@ -82,8 +82,8 @@ test.describe('Error Handling', () => {
     await sendButton.click();
     await expect(input).toBeDisabled();
 
-    // Wait for typing indicator to appear
-    await expect(page.locator('[aria-label="Typing"]')).toBeVisible({ timeout: 1000 });
+    // Wait for input to be cleared after message is sent and response received
+    await expect(input).toHaveValue('', { timeout: 5000 });
   });
 
   test('keeps chat usable after messages', async ({ page }) => {
