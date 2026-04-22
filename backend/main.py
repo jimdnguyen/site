@@ -20,7 +20,7 @@ allowed_origins = os.environ.get("ALLOWED_ORIGINS", "http://localhost:5173").spl
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins,
-    allow_methods=["POST", "GET"],
+    allow_methods=["POST", "GET", "HEAD"],
     allow_headers=["*"],
 )
 
