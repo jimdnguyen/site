@@ -35,7 +35,7 @@ _dist = Path(__file__).parent / "dist"
 if _dist.is_dir():
     app.mount("/assets", StaticFiles(directory=_dist / "assets"), name="assets")
 
-    @app.get("/{path:path}")
+    @app.api_route("/{path:path}", methods=["GET", "HEAD"])
     async def spa_fallback(path: str):
         file = _dist / path
         if file.is_file():
