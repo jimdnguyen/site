@@ -29,8 +29,8 @@ describe('About', () => {
   it('displays bio paragraphs with key information', () => {
     render(() => <About />);
     expect(screen.getByText(/backend-focused software engineer/i)).toBeInTheDocument();
-    expect(screen.getByText(/ComplyAi/)).toBeInTheDocument();
-    expect(screen.getByText(/1.4M\+ ads/)).toBeInTheDocument();
+    expect(screen.getAllByText(/ComplyAi/).length).toBeGreaterThan(0);
+    expect(screen.getByText(/~2\.8M ads/)).toBeInTheDocument();
     expect(screen.getByText(/UC Merced CS grad/i)).toBeInTheDocument();
   });
 
@@ -52,16 +52,16 @@ describe('About', () => {
   it('renders stat cards with correct values', () => {
     render(() => <About />);
     expect(screen.getByText('3+')).toBeInTheDocument();
-    expect(screen.getByText('1.4M+')).toBeInTheDocument();
+    expect(screen.getByText('2.8M+')).toBeInTheDocument();
     expect(screen.getByText('15+')).toBeInTheDocument();
     const statNumbers = document.querySelectorAll('.stat-number');
-    expect(Array.from(statNumbers).some(el => el.textContent === '2')).toBe(true);
+    expect(Array.from(statNumbers).some(el => el.textContent === '2,000+')).toBe(true);
   });
 
   it('renders stat labels for professional experience and data processing', () => {
     render(() => <About />);
     expect(screen.getByText(/Years of.*Professional Experience/i)).toBeInTheDocument();
-    expect(screen.getByText(/Ads Processed/i)).toBeInTheDocument();
+    expect(screen.getByText(/Ads Monitored/i)).toBeInTheDocument();
   });
 
   it('has the correct section id for anchor navigation', () => {
@@ -72,7 +72,7 @@ describe('About', () => {
 
   it('mentions cloud platforms in infrastructure text', () => {
     render(() => <About />);
-    expect(screen.getByText(/AWS and GCP infrastructure/i)).toBeInTheDocument();
+    expect(screen.getByText(/across AWS and GCP/i)).toBeInTheDocument();
   });
 
   it('mentions Python, Flask, and PostgreSQL as tech stack', () => {

@@ -1,10 +1,10 @@
 import { createSignal, onMount, onCleanup, For } from 'solid-js';
 
 const STATS = [
-  { value: '3+',    label: 'Years of\nProfessional Experience' },
-  { value: '1.4M+', label: 'Ads Processed\nThrough Data Pipelines' },
-  { value: '15+',   label: 'Clients Supported\nAcross AWS & GCP' },
-  { value: '2',     label: 'Major Cloud Platforms\n(AWS & GCP)' },
+  { value: '3+',     label: 'Years of\nProfessional Experience' },
+  { value: '2.8M+',  label: 'Ads Monitored\nAcross 2,400+ Accounts' },
+  { value: '2,000+', label: 'Pull Requests Merged\nAcross 5 Production Repos' },
+  { value: '15+',    label: 'Clients Supported\nAcross AWS & GCP' },
 ];
 
 function useReveal(threshold = 0.15) {
@@ -61,13 +61,14 @@ export default function About() {
               I'm a <strong>backend-focused software engineer</strong> based in Hawthorne, CA,
               with 3+ years building and operating production systems at a compliance tech startup.
               As a <strong>founding engineer at ComplyAi</strong>, I helped scale a prototype
-              into a multi-client SaaS platform processing{' '}
-              <strong>1.4M+ ads</strong> across AWS and GCP infrastructure.
+              into a multi-client SaaS platform monitoring{' '}
+              <strong>2,400+ ad accounts</strong> and <strong>~2.8M ads</strong> across AWS and GCP.
             </p>
             <p class="about-bio">
-              Experienced in Python/Flask, PostgreSQL, Celery, and cloud operations.
-              Currently deepening expertise in AI and agentic engineering patterns using
-              Claude Code and LLM-assisted development workflows.
+              Experienced in Python/Flask, PostgreSQL, Celery, and cloud operations, and now a
+              core engineer on ComplyAi's live <strong>v2 platform</strong> (Next.js, FastAPI, Supabase).
+              I work in an <strong>agentic development style</strong> — Claude Code with parallel
+              subagents and git worktrees — to ship features faster across the stack.
             </p>
             <p class="about-bio">
               UC Merced CS grad. Native English &amp; Vietnamese speaker. Always shipping.
