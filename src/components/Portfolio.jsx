@@ -1,4 +1,5 @@
-import { createSignal, onMount, onCleanup, For } from 'solid-js';
+import { createSignal, onMount, onCleanup, For, Show } from 'solid-js';
+import VoiceWidget from './VoiceWidget';
 
 function useReveal(threshold = 0.1) {
   let ref;
@@ -45,6 +46,46 @@ const PROJECTS = [
     github: 'https://github.com/jimdnguyen/prelegal',
     demo: 'https://prelegal.jimdnguyen.dev',
   },
+  {
+    icon: '💬',
+    bgClass: 'pc-bg-1',
+    iconColor: '#34d399',
+    title: 'Portfolio + AI Digital Twin',
+    desc: 'This site — a personal portfolio with an AI chat widget that answers visitor questions by proxying to an LLM over SSE streaming. Deployed on Oracle Cloud free tier via a Caddy reverse proxy and Docker Compose.',
+    tags: ['SolidJS', 'FastAPI', 'LiteLLM', 'SSE', 'Caddy', 'Docker'],
+    github: 'https://github.com/jimdnguyen/site',
+    demo: 'https://jimdnguyen.dev',
+  },
+  {
+    icon: '🤖',
+    bgClass: 'pc-bg-2',
+    iconColor: '#f59e0b',
+    title: 'Multi-Agent Sales Pipeline (n8n)',
+    desc: 'Low-code multi-agent outbound-sales system: a Business Development Manager agent orchestrates Prospecting (Firecrawl + Hunter.io via MCP), RevOps, and SDR sub-agents; an Account Executive agent books demos, fronted by an ElevenLabs voice agent reachable over a Twilio phone line. Deployed on n8n Cloud. AI Builder (n8n) course capstone.',
+    tags: ['n8n', 'MCP', 'Firecrawl', 'Hunter.io', 'ElevenLabs', 'Twilio', 'Pushover'],
+    agentId: 'agent_2001m5v8n7zwenqr9ar3drx6wnfy',
+    demoLabel: 'Talk to Agent',
+  },
+  {
+    icon: '🎙️',
+    bgClass: 'pc-bg-3',
+    iconColor: '#a78bfa',
+    title: 'Product Expert Voice Agent (n8n)',
+    desc: 'Retrieval-augmented voice agent that answers questions about an electronic-store product catalog. Agentic RAG pipeline in n8n: catalog data embedded into a Supabase vector store (pgvector, 1536-dim embeddings, match_documents retrieval), queried by an ElevenLabs voice agent. Deployed on n8n Cloud. AI Builder (n8n) course project.',
+    tags: ['n8n', 'ElevenLabs', 'Supabase pgvector', 'RAG', 'OpenRouter'],
+    agentId: 'agent_7301m5rhpb9ef50rk9d14ethx2dq',
+    demoLabel: 'Talk to Agent',
+  },
+  {
+    icon: '⚖️',
+    bgClass: 'pc-bg-1',
+    iconColor: '#10b981',
+    title: 'Equity Portfolio Rebalancing Agent (n8n)',
+    desc: 'Voice agent that rebalances an equity portfolio from live market data. The n8n workflow reads holdings from Google Sheets, pulls live prices, computes the rebalancing trades, and reports back through an ElevenLabs voice agent. Deployed on n8n Cloud. AI Builder (n8n) course project.',
+    tags: ['n8n', 'ElevenLabs', 'Google Sheets', 'Live Market Data', 'OpenRouter'],
+    agentId: 'agent_1001m5r5r52kfyp9qdpbq5sr1g8b',
+    demoLabel: 'Talk to Agent',
+  },
 ];
 
 function ProjectCard(props) {
@@ -65,6 +106,7 @@ function ProjectCard(props) {
           {props.project.icon}
         </span>
 
+        {(props.project.github || props.project.demo || props.project.agentId) && (
         <div class="portfolio-card-links">
           {props.project.github && (
             <a
@@ -80,7 +122,24 @@ function ProjectCard(props) {
               View on GitHub
             </a>
           )}
-          {props.project.demo && (
+          {props.project.agentId ? (
+            <button
+              type="button"
+              class="portfolio-demo-link"
+              onClick={(e) => {
+                e.stopPropagation();
+                props.onTalk({ agentId: props.project.agentId, title: props.project.title });
+              }}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                <line x1="12" y1="19" x2="12" y2="23"/>
+                <line x1="8" y1="23" x2="16" y2="23"/>
+              </svg>
+              {props.project.demoLabel || 'Talk to Agent'}
+            </button>
+          ) : props.project.demo && (
             <a
               href={props.project.demo}
               target="_blank"
@@ -93,10 +152,11 @@ function ProjectCard(props) {
                 <line x1="2" y1="12" x2="22" y2="12"/>
                 <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
               </svg>
-              Live Demo
+              {props.project.demoLabel || 'Live Demo'}
             </a>
           )}
         </div>
+        )}
       </div>
 
       <div class="portfolio-card-body">
@@ -114,6 +174,7 @@ function ProjectCard(props) {
 
 export default function Portfolio() {
   const [vis, setRef] = useReveal();
+  const [activeAgent, setActiveAgent] = createSignal(null);
 
   return (
     <section class="section" id="portfolio">
@@ -133,10 +194,22 @@ export default function Portfolio() {
 
         <div class="portfolio-grid">
           <For each={PROJECTS}>
-            {(project, i) => <ProjectCard project={project} delay={i() * 100} />}
+            {(project, i) => (
+              <ProjectCard project={project} delay={i() * 100} onTalk={setActiveAgent} />
+            )}
           </For>
         </div>
       </div>
+
+      <Show when={activeAgent()} keyed>
+        {(agent) => (
+          <VoiceWidget
+            agentId={agent.agentId}
+            title={agent.title}
+            onClose={() => setActiveAgent(null)}
+          />
+        )}
+      </Show>
     </section>
   );
 }

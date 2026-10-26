@@ -1,4 +1,4 @@
-import { render, screen } from '@solidjs/testing-library';
+import { render, screen, fireEvent } from '@solidjs/testing-library';
 import { describe, it, expect, beforeEach } from 'vitest';
 import Portfolio from '../components/Portfolio';
 
@@ -35,5 +35,16 @@ describe('Portfolio', () => {
     render(() => <Portfolio />);
     const links = screen.getAllByRole('link', { name: /github/i });
     expect(links.length).toBeGreaterThanOrEqual(3);
+  });
+
+  it('opens a voice session when "Talk to Agent" is clicked', () => {
+    render(() => <Portfolio />);
+    const talkButtons = screen.getAllByRole('button', { name: /talk to agent/i });
+    expect(talkButtons.length).toBeGreaterThanOrEqual(3);
+
+    fireEvent.click(talkButtons[0]);
+
+    expect(screen.getByRole('button', { name: /end voice chat/i })).toBeInTheDocument();
+    expect(document.body.classList.contains('voice-active')).toBe(true);
   });
 });

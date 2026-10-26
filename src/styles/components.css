@@ -819,6 +819,7 @@
   border: 1px solid var(--border);
   backdrop-filter: blur(8px);
   text-decoration: none;
+  cursor: pointer;
   transition: color var(--t-fast), border-color var(--t-fast), background var(--t-fast);
 }
 
@@ -832,6 +833,39 @@
   color: var(--text-primary);
   border-color: rgba(255,255,255,0.25);
   background: rgba(8, 8, 15, 0.9);
+}
+
+/* Voice agent session (ElevenLabs ConvAI floating widget) */
+.voice-end-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 2147483000; /* above the ElevenLabs widget */
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  background: rgba(8, 8, 15, 0.9);
+  border: 1px solid var(--border-bright);
+  border-radius: 999px;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+  transition: border-color var(--t-fast), background var(--t-fast);
+}
+
+.voice-end-btn:hover {
+  border-color: rgba(255, 255, 255, 0.35);
+  background: rgba(8, 8, 15, 1);
+}
+
+/* Hide the Digital Twin launcher while a voice session is active (both float bottom-right). */
+body.voice-active .dt-root {
+  display: none;
 }
 
 .portfolio-card-body {
